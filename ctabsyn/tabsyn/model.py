@@ -95,7 +95,8 @@ class FourierEmbedding(torch.nn.Module):
         return x
 
 class MLPDiffusion(nn.Module):
-    def __init__(self, d_in, n_classes=2, dim_t = 512):
+    # def __init__(self, d_in, n_classes=2, dim_t = 512):
+    def __init__(self, d_in, n_classes=3, dim_t = 512):
         super().__init__()
         self.dim_t = dim_t
 
@@ -117,8 +118,14 @@ class MLPDiffusion(nn.Module):
             nn.SiLU(),
             nn.Linear(dim_t, dim_t)
         )
+        # self.label_embed = nn.Sequential(
+        #     nn.Linear(n_classes, dim_t),
+        #     nn.SiLU(),
+        #     nn.Linear(dim_t, dim_t)
+        # )
+        # For ORD, n_classes will be 3 (Majority, Overlap, Minority)
         self.label_embed = nn.Sequential(
-            nn.Linear(n_classes, dim_t),
+            nn.Embedding(n_classes, dim_t),
             nn.SiLU(),
             nn.Linear(dim_t, dim_t)
         )
@@ -128,10 +135,21 @@ class MLPDiffusion(nn.Module):
         emb = emb.reshape(emb.shape[0], 2, -1).flip(1).reshape(*emb.shape) # swap sin/cos
         emb = self.time_embed(emb)
 
+        # #####
+        # label = label.float()
+        # label_emb = self.label_embed(label)
+        # #####
+
         #####
-        label = label.float()
+        # Ensure label is a long tensor for nn.Embedding
+        label = label.long()
+        # If label has a trailing dimension (e.g., [batch, 1]), squeeze it
+        if label.dim() > 1:
+            label = label.squeeze(-1)
+            
         label_emb = self.label_embed(label)
         #####
+
         x = self.proj(x) + emb + label_emb
         return self.mlp(x)
 

@@ -4,6 +4,9 @@ import numpy as np
 
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import TensorDataset
+
+import sys
 import argparse
 import warnings
 import time
@@ -11,6 +14,8 @@ import time
 from tqdm import tqdm
 from tabsyn.model import MLPDiffusion, Model
 from tabsyn.latent_utils import get_input_train
+
+from utils_train import get_tbs_sampler
 
 warnings.filterwarnings('ignore')
 
@@ -25,41 +30,76 @@ def main(args):
     if not os.path.exists(ckpt_path):
         os.makedirs(ckpt_path)
 
-    #####
-    # get labels/
-    label_path = f'{dataset_dir}/y_train.npy'
-    label = np.load(label_path)
-    label = label.reshape(-1)
-    label_hot = np.zeros((label.shape[0], len(np.unique(label))), dtype=int)
-    label_hot[np.arange(label.size), label] = 1
-    label_dim = label_hot.shape[1] # n_classes
-    #####
+    # #####
+    # # get labels/
+    # label_path = f'{dataset_dir}/y_train.npy'
+    # label = np.load(label_path)
+    # label = label.reshape(-1)
+    # label_hot = np.zeros((label.shape[0], len(np.unique(label))), dtype=int)
+    # label_hot[np.arange(label.size), label] = 1
+    # label_dim = label_hot.shape[1] # n_classes
+    # #####
 
+
+    # in_dim = train_z.shape[1] 
+
+    # mean, std = train_z.mean(0), train_z.std(0)
+
+    # train_z = (train_z - mean) / 2
+    # train_data = train_z
+
+    # #####
+    # train_data = np.concatenate([train_data, label_hot], axis=1)
+    # class_counts = [0] * label_dim
+    # for i in label:
+    #     class_counts[i] += 1
+    
+    # sample_weights = [0] * len(label)
+    # for i in range(len(label)):
+    #     sample_weights[i] = np.log(class_counts[label[i]])
+    
+    # sampler = torch.utils.data.sampler.WeightedRandomSampler(sample_weights, len(sample_weights))
+    # #####
+    # batch_size = 4096
+    # train_loader = DataLoader(
+    #     train_data,
+    #     batch_size = batch_size,
+    #     shuffle = True,
+    #     num_workers = 4,
+    # )
+
+    #####
+    # Get Integer Labels
+    label_path = f'{dataset_dir}/y_train.npy'
+    label = np.load(label_path).astype(int).reshape(-1)
+    label_dim = len(np.unique(label)) # Should be 3 for ORD
+    #####
 
     in_dim = train_z.shape[1] 
 
     mean, std = train_z.mean(0), train_z.std(0)
 
     train_z = (train_z - mean) / 2
-    train_data = train_z
+    
+    # 1. Convert to PyTorch Tensors
+    train_z_tensor = torch.tensor(train_z, dtype=torch.float32)
+    label_tensor = torch.tensor(label, dtype=torch.long)
+    
+    # 2. Use TensorDataset instead of manual concatenation
+    train_data = TensorDataset(train_z_tensor, label_tensor)
 
-    #####
-    train_data = np.concatenate([train_data, label_hot], axis=1)
-    class_counts = [0] * label_dim
-    for i in label:
-        class_counts[i] += 1
-    
-    sample_weights = [0] * len(label)
-    for i in range(len(label)):
-        sample_weights[i] = np.log(class_counts[label[i]])
-    
-    sampler = torch.utils.data.sampler.WeightedRandomSampler(sample_weights, len(sample_weights))
-    #####
+    # 3. Phase 3: Get the CTTVAE TBS Sampler
+    # lambda_tbs=0.5 explicitly balances the majority/minority exposure
+    tbs_sampler = get_tbs_sampler(label, lambda_tbs=0.5)
+
     batch_size = 4096
+    
+    # Notice: The original code had a bug where it defined 'sampler' but passed 'shuffle=True'.
+    # We remove shuffle=True and pass our tbs_sampler.
     train_loader = DataLoader(
         train_data,
         batch_size = batch_size,
-        shuffle = True,
+        sampler = tbs_sampler, 
         num_workers = 4,
     )
 
@@ -88,12 +128,12 @@ def main(args):
 
         batch_loss = 0.0
         len_input = 0
-        for batch in pbar:
-            inputs = batch.float().to(device)
-            #####
-            label = inputs[:,-label_dim:]
-            inputs = inputs[:,:-label_dim]
-            #####
+        
+        # Unpack the tuple directly
+        for inputs, label in pbar:
+            inputs = inputs.to(device)
+            label = label.to(device)
+            
             loss = model(inputs, label)
         
             loss = loss.mean()
@@ -106,6 +146,24 @@ def main(args):
             optimizer.step()
 
             pbar.set_postfix({"Loss": loss.item()})
+        # for batch in pbar:
+        #     inputs = batch.float().to(device)
+        #     #####
+        #     label = inputs[:,-label_dim:]
+        #     inputs = inputs[:,:-label_dim]
+        #     #####
+        #     loss = model(inputs, label)
+        
+        #     loss = loss.mean()
+
+        #     batch_loss += loss.item() * len(inputs)
+        #     len_input += len(inputs)
+
+        #     optimizer.zero_grad()
+        #     loss.backward()
+        #     optimizer.step()
+
+        #     pbar.set_postfix({"Loss": loss.item()})
 
         curr_loss = batch_loss/len_input
         scheduler.step(curr_loss)

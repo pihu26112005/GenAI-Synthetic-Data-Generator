@@ -2,9 +2,44 @@ import numpy as np
 import os
 
 import src
-from torch.utils.data import Dataset
+import torch
+from torch.utils.data import Dataset, WeightedRandomSampler
 
-class TabularDatasetCustom(Dataset):
+# class TabularDatasetCustom(Dataset):
+#     def __init__(self, X_num, X_cat, y):
+#         self.X_num = X_num
+#         self.X_cat = X_cat
+#         self.y = y
+
+#     def __getitem__(self, index):
+#         this_num = self.X_num[index]
+#         this_cat = self.X_cat[index]
+#         this_y = self.y[index]
+
+#         sample = (this_num, this_cat, this_y)
+
+#         return sample
+
+#     def __len__(self):
+#         return self.X_num.shape[0]
+        
+# class TabularDataset(Dataset):
+#     def __init__(self, X_num, X_cat):
+#         self.X_num = X_num
+#         self.X_cat = X_cat
+
+#     def __getitem__(self, index):
+#         this_num = self.X_num[index]
+#         this_cat = self.X_cat[index]
+
+#         sample = (this_num, this_cat)
+
+#         return sample
+
+#     def __len__(self):
+#         return self.X_num.shape[0]
+
+class TabularDataset(Dataset):
     def __init__(self, X_num, X_cat, y):
         self.X_num = X_num
         self.X_cat = X_cat
@@ -14,26 +49,9 @@ class TabularDatasetCustom(Dataset):
         this_num = self.X_num[index]
         this_cat = self.X_cat[index]
         this_y = self.y[index]
-
-        sample = (this_num, this_cat, this_y)
-
-        return sample
-
-    def __len__(self):
-        return self.X_num.shape[0]
         
-class TabularDataset(Dataset):
-    def __init__(self, X_num, X_cat):
-        self.X_num = X_num
-        self.X_cat = X_cat
-
-    def __getitem__(self, index):
-        this_num = self.X_num[index]
-        this_cat = self.X_cat[index]
-
-        sample = (this_num, this_cat)
-
-        return sample
+        # Yield the tuple directly; main.py will batch them
+        return this_num, this_cat, this_y
 
     def __len__(self):
         return self.X_num.shape[0]
@@ -169,3 +187,40 @@ def make_dataset(
     # D.y[split] = categorical_to_idx(D.y[split].squeeze(1))
 
     return src.transform_dataset(D, T, None)
+
+
+def get_tbs_sampler(y_train, lambda_tbs=0.5):
+    """
+    Creates a WeightedRandomSampler based on CTTVAE's Training-by-Sampling (TBS) PMF.
+    Interpolates between the original class distribution and a uniform distribution.
+    """
+    # Ensure y_train is a flattened integer array
+    y_train_int = np.array(y_train).astype(int).squeeze()
+    
+    # Calculate class distributions
+    class_counts = np.bincount(y_train_int)
+    total_samples = len(y_train_int)
+    
+    P_orig = class_counts / total_samples
+    
+    # For ternary ORD labels, len(class_counts) should be 3
+    P_uniform = np.ones(len(class_counts)) / len(class_counts)
+    
+    # Phase 3: The PMF Equation
+    # PMF[y] = \lambda * P_orig[y] + (1-\lambda) * (1/3)
+    PMF = lambda_tbs * P_orig + (1 - lambda_tbs) * P_uniform
+    
+    # The weight applied to an instance is proportional to Target PMF / Original P
+    class_weights = PMF / P_orig
+    
+    # Map the class weight to each individual sample in the dataset
+    sample_weights = torch.tensor([class_weights[y] for y in y_train_int], dtype=torch.float)
+    
+    # Instantiate the PyTorch sampler
+    tbs_sampler = WeightedRandomSampler(
+        weights=sample_weights,
+        num_samples=total_samples,
+        replacement=True
+    )
+    
+    return tbs_sampler
