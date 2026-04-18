@@ -179,19 +179,22 @@ def process_data(name):
 
     if info['test_path']:
 
-        # if testing data is given
+        # # if testing data is given
+        # test_path = info['test_path']
+
+        # with open(test_path, 'r') as f:
+        #     lines = f.readlines()[1:]
+        #     test_save_path = f'data/{name}/test.data'
+        #     if not os.path.exists(test_save_path):
+        #         with open(test_save_path, 'a') as f1:     
+        #             for line in lines:
+        #                 save_line = line.strip('\n').strip('.')
+        #                 f1.write(f'{save_line}\n')
+
+        # test_df = pd.read_csv(test_save_path, header = None)
+        # train_df = data_df
         test_path = info['test_path']
-
-        with open(test_path, 'r') as f:
-            lines = f.readlines()[1:]
-            test_save_path = f'data/{name}/test.data'
-            if not os.path.exists(test_save_path):
-                with open(test_save_path, 'a') as f1:     
-                    for line in lines:
-                        save_line = line.strip('\n').strip('.')
-                        f1.write(f'{save_line}\n')
-
-        test_df = pd.read_csv(test_save_path, header = None)
+        test_df = pd.read_csv(test_path, header=info['header'])
         train_df = data_df
 
     else:  

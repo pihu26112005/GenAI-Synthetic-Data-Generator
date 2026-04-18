@@ -1,0 +1,29 @@
+{
+    "name": "adult",
+    "task_type": "binclass",
+    "data_path": "data/adult/imbalanced_ord.csv",
+    "test_path": "data/adult/test.csv",
+    "file_type": "csv",
+    "header": 0,
+    "column_names": null,
+    "num_col_idx": [
+        0,
+        2,
+        3,
+        9,
+        10,
+        11
+    ],
+    "cat_col_idx": [
+        1,
+        4,
+        5,
+        6,
+        7,
+        8,
+        12
+    ],
+    "target_col_idx": [
+        13
+    ]
+}

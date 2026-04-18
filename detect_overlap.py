@@ -40,13 +40,17 @@ def boundary_function_helper(X_train, y_train, X_test, y_test, test, THRESHOLD=0
 
     boundary = []
     for i in range(len(y_test)):
-        if (y_test[i] != y_pred[i]) or (proba_test[i][0] >= THRESHOLD and proba_test[i][1] >= THRESHOLD):
+        # if (y_test[i] != y_pred[i]) or (proba_test[i][0] >= THRESHOLD and proba_test[i][1] >= THRESHOLD):
+        #     boundary.append(i)
+        # FIX: Use .iloc[i] to safely access the pandas Series by position
+        if (y_test.iloc[i] != y_pred[i]) or (proba_test[i][0] >= THRESHOLD and proba_test[i][1] >= THRESHOLD):
             boundary.append(i)
     print(f"There are {len(boundary)} points that have been wrongly predicted or are at the boundary")
         # Finding boundary samples from the test set by thresholding on the prediction probabilities or checking if a sample has been incorrectly predicted
     
     # creating a temporary dataframe that contains isBoundary=1 for the samples in the boundary list and 0 for others
-    df1 = test
+    # df1 = test
+    df1 = test.copy() # Safe copy to avoid SettingWithCopy warnings
     df1['isBoundary'] = 0
     for wrong in boundary:
         df1.loc[wrong, "isBoundary"] = 1
@@ -59,29 +63,48 @@ def find_boundary(df, TARGET,  RANDOM_STATE=42, threshold=0.4):
     df1 = pd.DataFrame()
     df2 = pd.DataFrame()
 
-    df_class1 = df[df[TARGET] == 1]
-    df_class0 = df[df[TARGET] == 0]
-    df = pd.concat([df_class0, df_class1], axis=0)
+    # df_class1 = df[df[TARGET] == 1]
+    # df_class0 = df[df[TARGET] == 0]
+    # df = pd.concat([df_class0, df_class1], axis=0)
     
-    start = [0, len(df_class0)//2]
-    end = [len(df_class0)//2, len(df_class0)]
+    # start = [0, len(df_class0)//2]
+    # end = [len(df_class0)//2, len(df_class0)]
+
+    # FIX: Safely isolate and reset indices
+    df_class1 = df[df[TARGET] == 1].reset_index(drop=True)
+    df_class0 = df[df[TARGET] == 0].reset_index(drop=True)
+    
+    # FIX: Safely split the majority class into two equal folds
+    folds = np.array_split(df_class0, 2)
 
     for i in range(2):
         print(f"Split {i+1}")
-        train = df.drop([k for k in range(start[i], end[i])], axis=0)
-        test = df.drop(train.index, axis=0)
-        train = train.reset_index(drop=True)
-        test = test.reset_index(drop=True)
+        # train = df.drop([k for k in range(start[i], end[i])], axis=0)
+        # test = df.drop(train.index, axis=0)
+
+        # Test set is purely the current fold of the majority class
+        test_majority = folds[i]
+        # Train set is the OTHER fold of the majority class
+        train_majority = folds[1-i]
+
+        # train = train.reset_index(drop=True)
+        # test = test.reset_index(drop=True)
+
+        # Train gets the remaining majority + ALL minority
+        train = pd.concat([train_majority, df_class1], axis=0).reset_index(drop=True)
+        test = test_majority.reset_index(drop=True)
+
         X_train = train.drop(TARGET, axis=1)
         y_train = train[TARGET]
         X_test = test.drop(TARGET, axis=1)
         y_test = test[TARGET]
         
         # get boundary dataframe
+        bnd_df = boundary_function_helper(X_train, y_train, X_test, y_test, test, threshold)
         if i == 0:
-            df1 = boundary_function_helper(X_train, y_train, X_test, y_test, test, threshold)
+            df1 = bnd_df
         else:
-            df2 = boundary_function_helper(X_train, y_train, X_test, y_test, test, threshold)
+            df2 = bnd_df
 
     
     bnd =  pd.concat([df1, df2], axis=0)
