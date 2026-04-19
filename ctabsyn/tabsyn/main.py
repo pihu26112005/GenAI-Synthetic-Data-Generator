@@ -198,3 +198,6 @@ if __name__ == '__main__':
         args.device = f'cuda:{args.gpu}'
     else:
         args.device = 'cpu'
+
+    # YOU MUST ADD THIS LINE TO ACTUALLY START TRAINING
+    main(args)
