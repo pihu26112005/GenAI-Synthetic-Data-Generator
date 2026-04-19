@@ -98,7 +98,13 @@ def ordinal_triplet_loss(mu, labels, m_close=1.0, m_far=2.5):
     assert m_far >= 2 * m_close, f"Crucial Constraint violated: m_far ({m_far}) must be >= 2 * m_close ({2 * m_close})"
 
     # Calculate distance matrix for the entire batch at once [Batch, Batch]
-    dist_matrix = torch.cdist(mu, mu, p=2) ** 2
+    # dist_matrix = torch.cdist(mu, mu, p=2) ** 2
+    
+    # Mathematically safe squared Euclidean distance (avoids NaN gradient bug)
+    mu_sq = torch.sum(mu ** 2, dim=1, keepdim=True)
+    dist_matrix = mu_sq + mu_sq.t() - 2 * torch.mm(mu, mu.t())
+    dist_matrix = torch.clamp(dist_matrix, min=0.0) # Ensure no negative distances from floating point errors
+
     labels = labels.squeeze()
     B = labels.size(0)
 
