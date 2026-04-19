@@ -90,72 +90,65 @@ def mmd_loss(z_sampled, z_prior):
     k_xy = rbf_kernel(z_sampled, z_prior)
     
     return k_xx.mean() + k_yy.mean() - 2 * k_xy.mean()
-
+    
 def ordinal_triplet_loss(mu, labels, m_close=1.0, m_far=2.5):
     """
-    Computes the Ordinal Triplet Loss. 
-    m_far MUST be >= 2 * m_close.
+    Computes the Ordinal Triplet Loss (Fully Vectorized for GPU).
     """
-    # 1. THE EXPLICIT CONSTRAINT CHECK
     assert m_far >= 2 * m_close, f"Crucial Constraint violated: m_far ({m_far}) must be >= 2 * m_close ({2 * m_close})"
 
+    # Calculate distance matrix for the entire batch at once [Batch, Batch]
     dist_matrix = torch.cdist(mu, mu, p=2) ** 2
-    loss = 0.0
-    valid_triplets = 0
-    
-    # Flatten labels if necessary
     labels = labels.squeeze()
+    B = labels.size(0)
+
+    # Create 2D grids of our labels to compare everything simultaneously
+    labels_col = labels.unsqueeze(1) # Shape: [B, 1]
+    labels_row = labels.unsqueeze(0) # Shape: [1, B]
+
+    # Mask for Positives: same label, but completely ignore the diagonal (self-distance)
+    pos_mask = (labels_col == labels_row) & ~torch.eye(B, dtype=torch.bool, device=mu.device)
     
-    for i in range(len(mu)):
-        anchor_label = labels[i]
-        
-        # Positives (same class)
-        pos_mask = (labels == anchor_label) & (torch.arange(len(labels), device=mu.device) != i)
-        # Negatives (different class)
-        neg_mask = (labels != anchor_label)
-        
-        if not pos_mask.any() or not neg_mask.any():
-            continue
-            
-        # Hardest positive (furthest same-class sample)
-        d_ap = dist_matrix[i][pos_mask].max()
-        
-        # We need to mine a negative. Let's pick semi-hard negatives per target margin
-        neg_indices = torch.where(neg_mask)[0]
-        
-        for neg_idx in neg_indices:
-            neg_label = labels[neg_idx]
-            
-            # Determine target margin based on ordinal distance
-            # e.g., 0 vs 1 is dist 1 (m_close). 0 vs 2 is dist 2 (m_far).
-            class_dist = abs(anchor_label.item() - neg_label.item())
-            if class_dist == 1:
-                m_target = m_close
-            elif class_dist == 2:
-                m_target = m_far
-            else:
-                continue # Should not happen with labels 0,1,2
-                
-            d_an = dist_matrix[i][neg_idx]
-            
-            # Semi-hard constraint: d_ap < d_an < d_ap + m_target
-            if d_an > d_ap and d_an < d_ap + m_target:
-                loss += torch.clamp(d_ap - d_an + m_target, min=0.0)
-                valid_triplets += 1
-                break # Just use one valid semi-hard negative per anchor
-                
-        # Fallback if no semi-hard found
-        if valid_triplets == 0 and len(neg_indices) > 0:
-            neg_idx = neg_indices[torch.randint(0, len(neg_indices), (1,))]
-            neg_label = labels[neg_idx]
-            class_dist = abs(anchor_label.item() - neg_label.item())
-            m_target = m_close if class_dist == 1 else m_far
-            d_an = dist_matrix[i][neg_idx]
-            loss += torch.clamp(d_ap - d_an + m_target, min=0.0)
-            valid_triplets += 1
+    # Mask for Negatives: different label
+    neg_mask = (labels_col != labels_row)
 
-    return loss / max(valid_triplets, 1)
+    if not pos_mask.any() or not neg_mask.any():
+        return torch.tensor(0.0, device=mu.device, requires_grad=True)
 
+    # 1. Find Hardest Positives (d_ap)
+    # Fill non-positives with -1.0 so they are ignored by the max() function
+    masked_pos_dists = dist_matrix.masked_fill(~pos_mask, -1.0)
+    d_ap = masked_pos_dists.max(dim=1)[0] # Shape: [B]
+    
+    # 2. Determine Target Margins based on Ordinal Distance
+    class_dist = torch.abs(labels_col - labels_row)
+    m_target = torch.where(class_dist == 1, m_close, torch.where(class_dist == 2, m_far, 0.0))
+
+    # 3. Calculate Loss Matrix for all possibilities
+    d_ap_expanded = d_ap.unsqueeze(1) # Shape: [B, 1]
+    loss_matrix = torch.clamp(d_ap_expanded - dist_matrix + m_target, min=0.0)
+
+    # 4. Filter for Semi-Hard Negatives (d_ap < d_an < d_ap + m_target)
+    semi_hard_mask = neg_mask & (dist_matrix > d_ap_expanded) & (dist_matrix < d_ap_expanded + m_target)
+
+    # Extract only the losses that meet the semi-hard criteria
+    valid_losses = loss_matrix[semi_hard_mask]
+
+    # 5. Average the loss, with a fallback if no semi-hard negatives exist
+    if valid_losses.numel() > 0:
+        return valid_losses.mean()
+    else:
+        # Fallback: just use the hardest negative (closest different class)
+        masked_neg_dists = dist_matrix.masked_fill(~neg_mask, float('inf'))
+        d_an, neg_indices = masked_neg_dists.min(dim=1) # Shape: [B]
+        
+        hardest_class_dist = torch.abs(labels - labels[neg_indices])
+        m_target_fallback = torch.where(hardest_class_dist == 1, m_close, m_far)
+        
+        fallback_losses = torch.clamp(d_ap - d_an + m_target_fallback, min=0.0)
+        valid_rows = neg_mask.any(dim=1)
+        
+        return fallback_losses[valid_rows].mean() if valid_rows.any() else torch.tensor(0.0, device=mu.device)
 
 def main(args):
     dataname = args.dataname
