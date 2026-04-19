@@ -90,7 +90,7 @@ def mmd_loss(z_sampled, z_prior):
     k_xy = rbf_kernel(z_sampled, z_prior)
     
     return k_xx.mean() + k_yy.mean() - 2 * k_xy.mean()
-    
+
 def ordinal_triplet_loss(mu, labels, m_close=1.0, m_far=2.5):
     """
     Computes the Ordinal Triplet Loss (Fully Vectorized for GPU).
@@ -235,7 +235,7 @@ def main(args):
 
     current_lr = optimizer.param_groups[0]['lr']
     patience = 0
-    max_patience = 50 # For early stopping
+    max_patience = 150 # For early stopping
 
     # beta = max_beta
     start_time = time.time()
