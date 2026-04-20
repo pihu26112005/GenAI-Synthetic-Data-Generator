@@ -3,8 +3,15 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import os
 
-dataname = "adult"
-target_column = "label" # Change this to the actual name of your target column (e.g., 'income')
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--dataname', type=str, default='adult', help='Dataset name')
+parser.add_argument('--target_column', type=str, default='income', help='Target column (e.g., income, label)')
+args = parser.parse_args()
+
+dataname = args.dataname
+target_column = args.target_column # Change this to the actual name of your target column (e.g., 'income')
 
 # 1. Load the REAL dataset (to teach the Random Forest what reality looks like)
 # Adjust this path to wherever your raw/processed real training CSV is stored
@@ -12,7 +19,7 @@ real_data_path = f"data/{dataname}/train.csv"
 real_df = pd.read_csv(real_data_path)
 
 # 2. Load the SYNTHETIC dataset from Model 1 (Vanilla)
-vanilla_csv_path = f"synthetic/{dataname}/ablation_1_vanilla.csv"
+vanilla_csv_path = f"evaluation/ablation/ablation_1_vanilla/{dataname}/synthetic.csv"
 synth_df = pd.read_csv(vanilla_csv_path)
 
 print(f"Loaded Real Data: {len(real_df)} rows")
@@ -64,6 +71,7 @@ print(f"Rows Deleted (Overlap Garbage): {dropped_count} ({(dropped_count/len(syn
 print(f"Final Cleaned Rows: {len(filtered_synth_df)}")
 print(f"{'='*50}")
 
-output_path = f"synthetic/{dataname}/ablation_2_band_aid.csv"
+output_path = f"evaluation/ablation/ablation_2_band_aid/{dataname}/synthetic.csv"
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
 filtered_synth_df.to_csv(output_path, index=False)
 print(f"Saved to: {output_path}")

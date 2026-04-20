@@ -1,16 +1,22 @@
 import os
 import subprocess
 import glob
+import argparse
 
-dataname = "adult"
-target_column = "income"
+parser = argparse.ArgumentParser()
+parser.add_argument('--dataname', type=str, default='adult', help='Dataset name')
+parser.add_argument('--target_column', type=str, default='income', help='Target column')
+args = parser.parse_args()
+
+dataname = args.dataname
+target_column = args.target_column
 
 models = [
     "ablation_1_vanilla",
     "ablation_2_band_aid",
-    "3_mmd_only",
-    "4_triplet_only",
-    "5_champion"
+    "ablation_3_mmd_only",
+    "ablation_4_triplet_only",
+    "ablation_5_final"
 ]
 
 print(f"Starting Final Evaluation Pipeline for '{dataname}'...\n")
