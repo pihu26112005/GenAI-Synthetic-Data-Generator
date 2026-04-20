@@ -55,7 +55,7 @@ def main(args):
         n_class_0 = total_samples // 2
         n_class_2 = total_samples - n_class_0
         print(f"Auto-balancing: Generating {n_class_0} Majority (0) and {n_class_2} Minority (2) samples.")
-        
+
     num_samples = n_class_0 + n_class_2
     
     if num_samples == 0:
@@ -132,3 +132,5 @@ if __name__ == '__main__':
         args.device = f'cuda:{args.gpu}'
     else:
         args.device = 'cpu'
+    
+    main(args)
