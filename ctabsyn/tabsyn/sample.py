@@ -37,11 +37,25 @@ def main(args):
     # mean = train_z.mean(0)
     # ######
 
+    train_z, _, _, ckpt_path, info, num_inverse, cat_inverse = get_input_generate(args)
+    in_dim = train_z.shape[1] 
+
+    mean = train_z.mean(0)
+
     # REMOVE cond_val and one_hot logic entirely. 
     # Replace with this explicit batch creation:
     
     n_class_0 = args.n_class_0
     n_class_2 = args.n_class_2
+
+    # 3. THE AUTO-BALANCE LOGIC
+    # If the user didn't specify numbers, default to a 50/50 split of the original dataset size
+    if n_class_0 == 0 and n_class_2 == 0:
+        total_samples = train_z.shape[0] # Usually ~32,000 for Adult
+        n_class_0 = total_samples // 2
+        n_class_2 = total_samples - n_class_0
+        print(f"Auto-balancing: Generating {n_class_0} Majority (0) and {n_class_2} Minority (2) samples.")
+        
     num_samples = n_class_0 + n_class_2
     
     if num_samples == 0:
@@ -53,10 +67,6 @@ def main(args):
     
     label_tensor = torch.cat([labels_0, labels_2]).to(device)
 
-    train_z, _, _, ckpt_path, info, num_inverse, cat_inverse = get_input_generate(args)
-    in_dim = train_z.shape[1] 
-
-    mean = train_z.mean(0)
 
 
     # denoise_fn = MLPDiffusion(in_dim, label_dim, 1024).to(device)
