@@ -16,7 +16,7 @@ gpu = args.gpu
 ablation_configs = [
     {"name": "ablation_3_mmd_only", "alpha": 0.0, "beta": 1.0},
     {"name": "ablation_4_triplet_only", "alpha": 1.0, "beta": 0.0},
-    # {"name": "ablation_5_final", "alpha": 1.0, "beta": 0.5} # <-- INSERT YOUR OPTUNA WINNERS HERE
+    {"name": "ablation_5_final", "alpha": 1.0, "beta": 0.5}
 ]
 
 custom_env = os.environ.copy()
