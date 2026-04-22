@@ -1,0 +1,67 @@
+No NaNs in numerical features, skipping
+self.category_embeddings.weight.shape=torch.Size([34, 4])
+self.category_embeddings.weight.shape=torch.Size([34, 4])
+epoch: 0, Train MSE: 6.710911, Train CE:1.678490, Train MMD:0.000490, Train Triplet:1.238623, Val MSE:5.557359, Val CE:1.738278, Val MMD:0.000500, Val Triplet:0.484448
+epoch: 1, Train MSE: 4.983135, Train CE:1.629865, Train MMD:0.000490, Train Triplet:1.026763, Val MSE:4.295043, Val CE:1.639987, Val MMD:0.000500, Val Triplet:0.459524
+epoch: 2, Train MSE: 3.916740, Train CE:1.562283, Train MMD:0.000490, Train Triplet:1.070940, Val MSE:3.386263, Val CE:1.553291, Val MMD:0.000500, Val Triplet:0.483688
+epoch: 3, Train MSE: 3.181563, Train CE:1.488450, Train MMD:0.000494, Train Triplet:1.047389, Val MSE:2.933539, Val CE:1.500079, Val MMD:0.000514, Val Triplet:0.504450
+epoch: 4, Train MSE: 2.677645, Train CE:1.466167, Train MMD:0.000583, Train Triplet:0.802630, Val MSE:2.418082, Val CE:1.552272, Val MMD:0.000785, Val Triplet:0.480087
+epoch: 5, Train MSE: 2.232903, Train CE:1.529755, Train MMD:0.001408, Train Triplet:0.799018, Val MSE:2.028589, Val CE:1.510525, Val MMD:0.002100, Val Triplet:0.477553
+epoch: 6, Train MSE: 1.891645, Train CE:1.437523, Train MMD:0.003384, Train Triplet:0.541084, Val MSE:1.743293, Val CE:1.518186, Val MMD:0.003573, Val Triplet:0.468547
+
+/home/teaching/miniforge3/envs/pihu-genai/lib/python3.10/site-packages/zero/config/base.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 1/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 1/4000:  12%|█▎        | 1/8 [00:00<00:03,  1.78it/s]
+Epoch 1/4000:  50%|█████     | 4/8 [00:00<00:00,  7.08it/s]
+Epoch 1/4000:  88%|████████▊ | 7/8 [00:00<00:00, 11.66it/s]
+Epoch 1/4000: 100%|██████████| 8/8 [00:00<00:00,  9.01it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 2/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 2/4000:  12%|█▎        | 1/8 [00:00<00:02,  3.10it/s]
+Epoch 2/4000:  50%|█████     | 4/8 [00:00<00:00, 10.51it/s]
+Epoch 2/4000:  88%|████████▊ | 7/8 [00:00<00:00, 15.36it/s]
+Epoch 2/4000: 100%|██████████| 8/8 [00:00<00:00, 12.16it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 3/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 3/4000:  12%|█▎        | 1/8 [00:00<00:02,  3.06it/s]
+Epoch 3/4000:  50%|█████     | 4/8 [00:00<00:00, 10.76it/s]
+Epoch 3/4000:  88%|████████▊ | 7/8 [00:00<00:00, 15.88it/s]
+Epoch 3/4000: 100%|██████████| 8/8 [00:00<00:00, 12.71it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 4/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 4/4000:  12%|█▎        | 1/8 [00:00<00:02,  3.08it/s]
+Epoch 4/4000:  50%|█████     | 4/8 [00:00<00:00, 10.75it/s]
+Epoch 4/4000:  88%|████████▊ | 7/8 [00:00<00:00, 15.65it/s]
+Epoch 4/4000: 100%|██████████| 8/8 [00:00<00:00, 12.61it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 5/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 5/4000:  12%|█▎        | 1/8 [00:00<00:02,  3.18it/s]
+Epoch 5/4000:  50%|█████     | 4/8 [00:00<00:00, 10.74it/s]
+Epoch 5/4000:  88%|████████▊ | 7/8 [00:00<00:00, 15.44it/s]
+Epoch 5/4000: 100%|██████████| 8/8 [00:00<00:00, 12.16it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 6/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 6/4000:  12%|█▎        | 1/8 [00:00<00:02,  3.22it/s]
+Epoch 6/4000:  50%|█████     | 4/8 [00:00<00:00, 11.00it/s]
+Epoch 6/4000:  88%|████████▊ | 7/8 [00:00<00:00, 15.83it/s]
+Epoch 6/4000: 100%|██████████| 8/8 [00:00<00:00, 12.83it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 7/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 7/4000:  12%|█▎        | 1/8 [00:00<00:02,  3.15it/s]
+Epoch 7/4000:  50%|█████     | 4/8 [00:00<00:00, 10.79it/s]
+Epoch 7/4000:  88%|████████▊ | 7/8 [00:00<00:00, 15.64it/s]
+Epoch 7/4000: 100%|██████████| 8/8 [00:00<00:00, 12.61it/s]
+
+  0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 8/4000:   0%|          | 0/8 [00:00<?, ?it/s]
+Epoch 8/4000:  12%|█▎        | 1/8 [00:00<00:02,  2.99it/s]
+Epoch 8/4000:  50%|█████     | 4/8 [00:00<00:00, 10.54it/s]

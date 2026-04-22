@@ -144,6 +144,9 @@ def get_args():
     parser.add_argument('--min_beta', type=float, default=1e-5, help='Minimum beta.')
     parser.add_argument('--lambd', type=float, default=0.7, help='Batch size.')
 
+    # configs for the new model
+    parser.add_argument('--beta', type=float, default=0.5, help='Beta')
+    parser.add_argument('--alpha', type=float, default=1, help='Alpha')
 
     # configs for sampling
     parser.add_argument('--save_path', type=str, default=None, help='Path to save synthetic data.')

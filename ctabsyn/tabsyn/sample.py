@@ -45,8 +45,8 @@ def main(args):
     # REMOVE cond_val and one_hot logic entirely. 
     # Replace with this explicit batch creation:
     
-    n_class_0 = args.n_class_0
-    n_class_2 = args.n_class_2
+    n_class_0 = 0
+    n_class_2 = 0
 
     # 3. THE AUTO-BALANCE LOGIC
     # If the user didn't specify numbers, default to a 50/50 split of the original dataset size
