@@ -1,0 +1,7 @@
+Model,XGB_Macro_Acc,XGB_Min_Recall,XGB_F1,XGB_AUC_ROC,SDMetrics_Avg_MLE
+1. Vanilla (No Triplet/MMD),80.75%,83.85%,81.33%,89.7%,81.16%
+2. Post-Hoc Filter (Band-Aid),65.9%,33.2%,49.33%,85.81%,50.06%
+3. MMD Only,80.68%,79.95%,80.53%,89.35%,79.2%
+4. Triplet Only,78.77%,76.35%,78.25%,88.23%,78.68%
+5. Champion (Triplet+MMD),79.97%,77.85%,79.54%,89.02%,78.75%
+Baseline (TabDDPM),80.97%,81.9%,81.15%,89.3%,80.29%

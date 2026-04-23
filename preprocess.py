@@ -48,6 +48,6 @@ imb_df = imb_df.sample(frac=1, random_state=42).reset_index(drop=True)
 test = test.sample(frac=1, random_state=42).reset_index(drop=True)
 
 imb_df.to_csv(f'data/{DATANAME}/imbalanced_noord.csv', index=False)
-test.to_csv(f'data/{DATANAME}/test.csv', index=False)
+test.to_csv(f'data/{DATANAME}/test_orig.csv', index=False)
 
 

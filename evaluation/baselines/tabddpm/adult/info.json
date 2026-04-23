@@ -1,0 +1,17 @@
+{
+    "task_type": "binclass",
+    "n_num_features": 6,
+    "n_cat_features": 7,
+    "cat_sizes": [
+        7,
+        5,
+        7,
+        5,
+        3,
+        2,
+        2
+    ],
+    "train_size": 26123,
+    "val_size": 6531,
+    "test_size": 4000
+}
