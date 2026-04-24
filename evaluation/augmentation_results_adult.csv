@@ -1,0 +1,4 @@
+Augmentation Strategy,Macro Acc,Minority Recall,F1 Score,AUC-ROC
+1. S_00 ∪ S_1 (Pure Synthetic),79.92%,78.2%,79.57%,88.82%
+2. S_00 ∪ S_1 ∪ D_1 (Syn + Real Minority),80.05%,78.9%,79.82%,88.94%
+3. S_00 ∪ S_1 ∪ D_1 ∪ D_0_sub (Full Hybrid),79.97%,77.8%,79.53%,89.07%

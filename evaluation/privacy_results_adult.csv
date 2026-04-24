@@ -1,0 +1,7 @@
+Model,5th% DCR (↑),5th% NNDR (↑)
+1. Vanilla,0.0123,0.348
+2. Post-Hoc,0.0063,0.2977
+3. MMD Only,0.0101,0.3001
+4. Triplet Only,0.0105,0.2442
+5. Champion,0.0108,0.2909
+TabDDPM Baseline,0.0112,0.3339

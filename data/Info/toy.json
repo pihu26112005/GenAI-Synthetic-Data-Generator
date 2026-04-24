@@ -1,0 +1,16 @@
+{
+    "name": "toy",
+    "task_type": "binclass",
+    "data_path": "data/toy/imbalanced_ord.csv",
+    "test_path": "data/toy/test.csv",
+    "file_type": "csv",
+    "header": 0,
+    "column_names": [
+        "f1",
+        "f2",
+        "cond"
+    ],
+    "num_col_idx": [0, 1],
+    "cat_col_idx": [],
+    "target_col_idx": [2]
+}

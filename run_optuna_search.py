@@ -3,7 +3,7 @@ import subprocess
 import re
 import optuna
 
-dataname = "adult"
+dataname = "toy"
 gpu = 0
 
 # Set up the environment variable
@@ -55,7 +55,7 @@ def objective(trial):
 # 4. Create the Study and let Optuna loose!
 print("Starting Optuna Bayesian Optimization...")
 study = optuna.create_study(directions=["minimize", "minimize"]) # We want the lowest MSE possible
-study.optimize(objective, n_trials=25) # Let it run 12 intelligent trials
+study.optimize(objective, n_trials=10) # Let it run 12 intelligent trials
 
 # 5. Print the Pareto Front (Best Trade-offs)
 print(f"\n{'='*50}")

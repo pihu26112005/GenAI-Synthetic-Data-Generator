@@ -14,9 +14,9 @@ gpu = args.gpu
 
 # Your custom Ablations
 ablation_configs = [
-    # {"name": "ablation_3_mmd_only", "alpha": 0.0, "beta": 1.0},
+    {"name": "ablation_3_mmd_only", "alpha": 0.0, "beta": 1.0},
     {"name": "ablation_4_triplet_only", "alpha": 1.0, "beta": 0.0},
-    # {"name": "ablation_5_final", "alpha": 1.0, "beta": 0.5}
+    {"name": "ablation_5_final", "alpha": 0.1514, "beta": 1.9841}
 ]
 
 custom_env = os.environ.copy()

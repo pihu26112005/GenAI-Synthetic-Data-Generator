@@ -1,0 +1,66 @@
+{
+    "name": "toy",
+    "task_type": "binclass",
+    "data_path": "data/toy/imbalanced_ord.csv",
+    "test_path": "data/toy/test.csv",
+    "file_type": "csv",
+    "header": 0,
+    "column_names": [
+        "f1",
+        "f2",
+        "cond"
+    ],
+    "num_col_idx": [
+        0,
+        1
+    ],
+    "cat_col_idx": [],
+    "target_col_idx": [
+        2
+    ],
+    "column_info": {
+        "0": {},
+        "type": "categorical",
+        "max": 49.262377064363264,
+        "min": -63.31801519003252,
+        "1": {},
+        "2": {},
+        "categorizes": [
+            0,
+            1,
+            2
+        ]
+    },
+    "train_num": 6160,
+    "test_num": 1540,
+    "idx_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+    },
+    "inverse_idx_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+    },
+    "idx_name_mapping": {
+        "0": "f1",
+        "1": "f2",
+        "2": "cond"
+    },
+    "metadata": {
+        "columns": {
+            "0": {
+                "sdtype": "numerical",
+                "computer_representation": "Float"
+            },
+            "1": {
+                "sdtype": "numerical",
+                "computer_representation": "Float"
+            },
+            "2": {
+                "sdtype": "categorical"
+            }
+        }
+    }
+}

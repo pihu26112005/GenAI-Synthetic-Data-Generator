@@ -27,9 +27,22 @@ print(f"🚀 TRAINING: {name.upper()}")
 print(f"{'='*60}")
 
 # Path to the original ctabsyn repo
-repo_dir = os.path.abspath(os.path.join("ctabsyn", "original_ctabsyn"))
+repo_dir = os.path.abspath(os.path.join("ctabsyn", "baselines", "original_ctabsyn"))
 custom_env = os.environ.copy()
 custom_env["PYTHONPATH"] = os.path.join(repo_dir, "ctabsyn") + os.pathsep + custom_env.get("PYTHONPATH", "")
+
+# =====================================================================
+# THE FIX: Copy the preprocessed data from the root to the cloned repo
+# =====================================================================
+root_data_dir = os.path.abspath(os.path.join("data", dataname))
+repo_data_dir = os.path.join(repo_dir, "data", dataname)
+
+if not os.path.exists(repo_data_dir):
+    print(f"📁 Copying '{dataname}' data to the baseline repo...")
+    shutil.copytree(root_data_dir, repo_data_dir)
+else:
+    print(f"📁 '{dataname}' data already exists in baseline repo.")
+# =====================================================================
 
 # 1. Train VAE - no alpha/beta for original
 print(f"\n[1/3] Training VAE...")

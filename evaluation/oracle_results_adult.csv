@@ -1,0 +1,7 @@
+Model,Oracle Overall Acc (↑),Oracle Minority Acc (↑),Oracle Majority Acc (↑)
+1. Vanilla (No Triplet/MMD),77.56%,74.51%,80.6%
+2. Post-Hoc Filter (Band-Aid),84.37%,99.77%,82.37%
+3. MMD Only,83.15%,85.01%,81.3%
+4. Triplet Only,84.36%,87.06%,81.67%
+5. Champion (Triplet+MMD),83.03%,84.5%,81.55%
+Baseline (TabDDPM),79.82%,79.86%,79.78%
